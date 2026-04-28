@@ -103,3 +103,11 @@ Password for all seeded demo accounts: `borderflow123`
 ## K3s
 
 K3s deployment templates and bootstrap notes are in [infra/k8s/README.md](infra/k8s/README.md).
+
+## Project documents
+
+Supporting Word documents are stored in [docs/](docs/):
+
+- [BorderFlow_Week1_Proposal.docx](docs/BorderFlow_Week1_Proposal.docx)
+- [Squad_X_Week4.docx](docs/Squad_X_Week4.docx)
+- [Squad_X_ERD_and_schema.docx](docs/Squad_X_ERD_and_schema.docx)
