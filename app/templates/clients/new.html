@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/clients" method="post" class="stack">
+    <label>
+      <span>Company name</span>
+      <input type="text" name="company_name" required>
+    </label>
+    <label>
+      <span>Contact name</span>
+      <input type="text" name="contact_name" required>
+    </label>
+    <label>
+      <span>Contact email</span>
+      <input type="email" name="contact_email" required>
+    </label>
+    <label>
+      <span>Contact phone</span>
+      <input type="text" name="contact_phone">
+    </label>
+    <label>
+      <span>Country</span>
+      <input type="text" name="country" required>
+    </label>
+    <div class="action-row">
+      <a href="/clients" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Register client</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

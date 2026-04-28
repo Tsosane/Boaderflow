@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/consignments" method="post" class="stack">
+    <label>
+      <span>Client</span>
+      <select name="client_id" required>
+        {% for client in clients %}
+        <option value="{{ client.id }}">{{ client.company_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Destination site</span>
+      <select name="destination_site_id" required>
+        {% for site in destinations %}
+        <option value="{{ site.id }}">{{ site.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Reference number</span>
+      <input type="text" name="reference_no" placeholder="BF-2026-00123" required>
+    </label>
+    <label>
+      <span>Notes</span>
+      <textarea name="notes" rows="4" placeholder="Optional shipment context"></textarea>
+    </label>
+    <div class="action-row">
+      <a href="/consignments" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Create consignment</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

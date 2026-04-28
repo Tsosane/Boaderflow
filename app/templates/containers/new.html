@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/containers" method="post" class="stack">
+    <label>
+      <span>Consignment</span>
+      <select name="consignment_id" required>
+        {% for consignment in consignments %}
+        <option value="{{ consignment.id }}">{{ consignment.reference_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Container number</span>
+      <input type="text" name="container_no" placeholder="MSCU1234567" required>
+    </label>
+    <label>
+      <span>Container type</span>
+      <input type="text" name="container_type" placeholder="40FT_HC" required>
+    </label>
+    <label>
+      <span>Seal number</span>
+      <input type="text" name="seal_no" placeholder="SEAL-001">
+    </label>
+    <label>
+      <span>Gross weight (kg)</span>
+      <input type="number" name="gross_weight_kg" step="0.01" placeholder="18000">
+    </label>
+    <label>
+      <span>Cargo description</span>
+      <textarea name="cargo_description" rows="4" placeholder="What is inside the container?"></textarea>
+    </label>
+    <div class="action-row">
+      <a href="/containers" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Register</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

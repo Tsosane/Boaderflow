@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/drivers" method="post" class="stack">
+    <label>
+      <span>Full name</span>
+      <input type="text" name="full_name" required>
+    </label>
+    <label>
+      <span>Email</span>
+      <input type="email" name="email" required>
+    </label>
+    <label>
+      <span>Temporary password</span>
+      <input type="text" name="password" value="{{ default_password }}" required>
+    </label>
+    <label>
+      <span>Licence number</span>
+      <input type="text" name="licence_no" required>
+    </label>
+    <label>
+      <span>Licence expiry</span>
+      <input type="date" name="licence_expiry" required>
+    </label>
+    <div class="action-row">
+      <a href="/drivers" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Register driver</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

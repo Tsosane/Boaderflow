@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title or "BorderFlow" }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <p class="eyebrow">Distributed Logistics</p>
+        <h1>BorderFlow</h1>
+        <p class="site-chip">{{ site_name }}</p>
+        <p class="muted">{{ site_code }}</p>
+      </div>
+
+      {% if current_user %}
+      <nav class="nav">
+        <a href="/dashboard">Dashboard</a>
+
+        {% if current_user.role == "DEPOT_CONTROLLER" %}
+        <a href="/users">Site users</a>
+        <a href="/clients">Clients</a>
+        <a href="/vehicles">Vehicles</a>
+        <a href="/drivers">Drivers</a>
+        <a href="/consignments">Consignments</a>
+        <a href="/containers">Containers</a>
+        <a href="/trips">Trips</a>
+        <a href="/incidents">Incidents</a>
+        {% endif %}
+
+        {% if current_user.role in ["BORDER_AGENT", "PORT_AGENT", "HUB_OPERATOR"] %}
+        <a href="/users">Site users</a>
+        <a href="/milestones">Milestones</a>
+        <a href="/handovers">Handovers</a>
+        <a href="/incidents">Incidents</a>
+        {% endif %}
+
+        {% if current_user.role == "MANAGER" %}
+        <a href="/users">Site users</a>
+        <a href="/control-tower/containers">Containers</a>
+        <a href="/control-tower/conflicts">Conflicts</a>
+        <a href="/control-tower/replication">Replication</a>
+        {% endif %}
+      </nav>
+
+      <form action="/auth/logout" method="post" class="sidebar-footer">
+        <p class="muted small">{{ current_user.full_name }}</p>
+        <p class="muted small">{{ current_user.role|humanize }}</p>
+        <button type="submit" class="button button-secondary button-full">Logout</button>
+      </form>
+      {% endif %}
+    </aside>
+
+    <main class="content">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Offline-First Operations</p>
+          <h2>{{ page_title or "BorderFlow" }}</h2>
+        </div>
+        {% if current_user %}
+        <div class="header-actions">
+          <div class="pill-group">
+            <span class="pill">Role: {{ current_user.role|humanize }}</span>
+            <span class="pill">Site: {{ site_code }}</span>
+          </div>
+          <form action="/auth/logout" method="post">
+            <button type="submit" class="button button-secondary">Logout</button>
+          </form>
+        </div>
+        {% endif %}
+      </header>
+
+      {% if message %}
+      <div class="alert success">{{ message }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="alert error">{{ error }}</div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

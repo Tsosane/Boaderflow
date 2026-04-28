@@ -1,0 +1,88 @@
+{
+  "replication_user": "repl_user",
+  "replication_password": "repl_pass",
+  "sites": {
+    "depot": {
+      "site_code": "DEPOT-MSU",
+      "admin_dsn": "postgresql://borderflow:borderflow@depot-db:5432/borderflow"
+    },
+    "border": {
+      "site_code": "BORDER-MB",
+      "admin_dsn": "postgresql://borderflow:borderflow@border-db:5432/borderflow"
+    },
+    "port": {
+      "site_code": "PORT-DBN",
+      "admin_dsn": "postgresql://borderflow:borderflow@port-db:5432/borderflow"
+    },
+    "hub": {
+      "site_code": "HUB-JHB",
+      "admin_dsn": "postgresql://borderflow:borderflow@hub-db:5432/borderflow"
+    },
+    "tower": {
+      "site_code": "CTRL-TOWER",
+      "admin_dsn": "postgresql://borderflow:borderflow@tower-db:5432/borderflow"
+    }
+  },
+  "subscriptions": [
+    {
+      "name": "sub_border_from_depot",
+      "subscriber": "border",
+      "publisher": "depot",
+      "publication": "pub_depot_master"
+    },
+    {
+      "name": "sub_port_from_depot",
+      "subscriber": "port",
+      "publisher": "depot",
+      "publication": "pub_depot_master"
+    },
+    {
+      "name": "sub_port_from_border",
+      "subscriber": "port",
+      "publisher": "border",
+      "publication": "pub_border_events"
+    },
+    {
+      "name": "sub_hub_from_depot",
+      "subscriber": "hub",
+      "publisher": "depot",
+      "publication": "pub_depot_master"
+    },
+    {
+      "name": "sub_hub_from_border",
+      "subscriber": "hub",
+      "publisher": "border",
+      "publication": "pub_border_events"
+    },
+    {
+      "name": "sub_hub_from_port",
+      "subscriber": "hub",
+      "publisher": "port",
+      "publication": "pub_port_events"
+    },
+    {
+      "name": "sub_tower_from_depot",
+      "subscriber": "tower",
+      "publisher": "depot",
+      "publication": "pub_depot_master"
+    },
+    {
+      "name": "sub_tower_from_border",
+      "subscriber": "tower",
+      "publisher": "border",
+      "publication": "pub_border_events"
+    },
+    {
+      "name": "sub_tower_from_port",
+      "subscriber": "tower",
+      "publisher": "port",
+      "publication": "pub_port_events"
+    },
+    {
+      "name": "sub_tower_from_hub",
+      "subscriber": "tower",
+      "publisher": "hub",
+      "publication": "pub_hub_events"
+    }
+  ]
+}

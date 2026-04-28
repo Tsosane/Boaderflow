@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BorderFlow Sign Up</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="auth-body">
+  <section class="auth-shell">
+    <div class="auth-panel">
+      <p class="eyebrow">Cross-Border Operations</p>
+      <h1>BorderFlow</h1>
+      <p class="lead">Create a new account for {{ site_name }}.</p>
+
+      {% if message %}
+      <div class="alert success">{{ message }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="alert error">{{ error }}</div>
+      {% endif %}
+
+      <form action="/auth/register" method="post" class="stack">
+        <label>
+          <span>Full name</span>
+          <input type="text" name="full_name" required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required>
+        </label>
+        <label>
+          <span>Role</span>
+          <select name="role" required>
+            {% for role in allowed_roles %}
+            <option value="{{ role }}">{{ role|humanize }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        {% if show_driver_fields %}
+        <div class="driver-panel">
+          <p class="muted small">Required only when registering a Driver account.</p>
+          <label>
+            <span>Licence number</span>
+            <input type="text" name="licence_no">
+          </label>
+          <label>
+            <span>Licence expiry</span>
+            <input type="datetime-local" name="licence_expiry">
+          </label>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="button">Create Account</button>
+      </form>
+
+      <div class="auth-links">
+        <span class="muted">Already have an account?</span>
+        <a class="button button-secondary" href="/auth/login">Back to Sign In</a>
+      </div>
+    </div>
+
+    <div class="auth-side">
+      <h3>Site registration</h3>
+      <ul class="plain-list">
+        {% for role in allowed_roles %}
+        <li>{{ role|humanize }}</li>
+        {% endfor %}
+      </ul>
+      {% if show_driver_fields %}
+      <p class="muted">Driver signup creates both the user account and the linked driver profile.</p>
+      {% endif %}
+    </div>
+  </section>
+</body>
+</html>

@@ -1,0 +1,412 @@
+x-app-image: &app-image
+  build:
+    context: ..
+    dockerfile: infra/docker/api.Dockerfile
+
+x-worker-image: &worker-image
+  build:
+    context: ..
+    dockerfile: infra/docker/worker.Dockerfile
+
+x-env-common: &env-common
+  API_SECRET_KEY: borderflow-demo-secret
+  BOOTSTRAP_DATABASE: "false"
+  REPLICATION_USER: repl_user
+  REPLICATION_PASSWORD: repl_pass
+  TOPOLOGY_PATH: infra/replication_topology.json
+  WORKER_REFRESH_INTERVAL_SECONDS: "15"
+  WORKER_HEALTH_INTERVAL_SECONDS: "30"
+
+x-db-common: &db-common
+  image: postgres:16
+  command:
+    - postgres
+    - -c
+    - wal_level=logical
+    - -c
+    - max_replication_slots=64
+    - -c
+    - max_wal_senders=64
+    - -c
+    - max_logical_replication_workers=64
+    - -c
+    - max_worker_processes=80
+  environment:
+    POSTGRES_USER: borderflow
+    POSTGRES_PASSWORD: borderflow
+    POSTGRES_DB: borderflow
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U borderflow -d borderflow"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+  restart: unless-stopped
+  networks: [borderflow_net]
+
+x-redis-common: &redis-common
+  image: redis:7
+  command: ["redis-server", "--appendonly", "yes"]
+  restart: unless-stopped
+  networks: [borderflow_net]
+
+x-init-common: &init-common
+  <<: *app-image
+  restart: "no"
+  networks: [borderflow_net]
+  environment:
+    <<: *env-common
+
+x-api-common: &api-common
+  <<: *app-image
+  restart: unless-stopped
+  networks: [borderflow_net]
+  environment:
+    <<: *env-common
+
+x-worker-common: &worker-common
+  <<: *worker-image
+  restart: unless-stopped
+  networks: [borderflow_net]
+  environment:
+    <<: *env-common
+
+services:
+  depot-db:
+    <<: *db-common
+    ports: ["5433:5432"]
+    volumes: ["depot_db_data:/var/lib/postgresql/data"]
+
+  border-db:
+    <<: *db-common
+    ports: ["5434:5432"]
+    volumes: ["border_db_data:/var/lib/postgresql/data"]
+
+  port-db:
+    <<: *db-common
+    ports: ["5435:5432"]
+    volumes: ["port_db_data:/var/lib/postgresql/data"]
+
+  hub-db:
+    <<: *db-common
+    ports: ["5436:5432"]
+    volumes: ["hub_db_data:/var/lib/postgresql/data"]
+
+  tower-db:
+    <<: *db-common
+    ports: ["5437:5432"]
+    volumes: ["tower_db_data:/var/lib/postgresql/data"]
+
+  depot-redis:
+    <<: *redis-common
+    volumes: ["depot_redis_data:/data"]
+
+  border-redis:
+    <<: *redis-common
+    volumes: ["border_redis_data:/data"]
+
+  port-redis:
+    <<: *redis-common
+    volumes: ["port_redis_data:/data"]
+
+  hub-redis:
+    <<: *redis-common
+    volumes: ["hub_redis_data:/data"]
+
+  tower-redis:
+    <<: *redis-common
+    volumes: ["tower_redis_data:/data"]
+
+  depot-init:
+    <<: *init-common
+    depends_on:
+      depot-db:
+        condition: service_healthy
+    command: ["python", "-m", "app.cli", "init-site"]
+    environment:
+      <<: *env-common
+      SITE_CODE: DEPOT-MSU
+      SITE_NAME: Maseru Depot
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@depot-db:5432/borderflow
+      REDIS_URL: redis://depot-redis:6379/0
+      SEED_SCOPE: depot_only
+      REPL_PUBLICATIONS: pub_depot_master
+      REPL_SUBSCRIPTIONS: ""
+
+  border-init:
+    <<: *init-common
+    depends_on:
+      border-db:
+        condition: service_healthy
+    command: ["python", "-m", "app.cli", "init-site"]
+    environment:
+      <<: *env-common
+      SITE_CODE: BORDER-MB
+      SITE_NAME: Maseru Bridge Border Post
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@border-db:5432/borderflow
+      REDIS_URL: redis://border-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_border_events
+      REPL_SUBSCRIPTIONS: sub_border_from_depot
+
+  port-init:
+    <<: *init-common
+    depends_on:
+      port-db:
+        condition: service_healthy
+    command: ["python", "-m", "app.cli", "init-site"]
+    environment:
+      <<: *env-common
+      SITE_CODE: PORT-DBN
+      SITE_NAME: Durban Port Agent
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@port-db:5432/borderflow
+      REDIS_URL: redis://port-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_port_events
+      REPL_SUBSCRIPTIONS: sub_port_from_depot,sub_port_from_border
+
+  hub-init:
+    <<: *init-common
+    depends_on:
+      hub-db:
+        condition: service_healthy
+    command: ["python", "-m", "app.cli", "init-site"]
+    environment:
+      <<: *env-common
+      SITE_CODE: HUB-JHB
+      SITE_NAME: Johannesburg Destination Hub
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@hub-db:5432/borderflow
+      REDIS_URL: redis://hub-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_hub_events
+      REPL_SUBSCRIPTIONS: sub_hub_from_depot,sub_hub_from_border,sub_hub_from_port
+
+  tower-init:
+    <<: *init-common
+    depends_on:
+      tower-db:
+        condition: service_healthy
+    command: ["python", "-m", "app.cli", "init-site"]
+    environment:
+      <<: *env-common
+      SITE_CODE: CTRL-TOWER
+      SITE_NAME: Control Tower
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@tower-db:5432/borderflow
+      REDIS_URL: redis://tower-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: ""
+      REPL_SUBSCRIPTIONS: sub_tower_from_depot,sub_tower_from_border,sub_tower_from_port,sub_tower_from_hub
+
+  replication-init:
+    <<: *init-common
+    depends_on:
+      depot-init:
+        condition: service_completed_successfully
+      border-init:
+        condition: service_completed_successfully
+      port-init:
+        condition: service_completed_successfully
+      hub-init:
+        condition: service_completed_successfully
+      tower-init:
+        condition: service_completed_successfully
+    command: ["python", "-m", "app.cli", "setup-replication", "--reset", "--topology", "infra/replication_topology.json"]
+    environment:
+      <<: *env-common
+      SITE_CODE: DEPOT-MSU
+      SITE_NAME: Maseru Depot
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@depot-db:5432/borderflow
+      REDIS_URL: redis://depot-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_depot_master
+      REPL_SUBSCRIPTIONS: ""
+
+  depot-api:
+    <<: *api-common
+    depends_on:
+      depot-init:
+        condition: service_completed_successfully
+      replication-init:
+        condition: service_completed_successfully
+      depot-redis:
+        condition: service_started
+    ports: ["8001:8000"]
+    environment:
+      <<: *env-common
+      SITE_CODE: DEPOT-MSU
+      SITE_NAME: Maseru Depot
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@depot-db:5432/borderflow
+      REDIS_URL: redis://depot-redis:6379/0
+      SEED_SCOPE: depot_only
+      REPL_PUBLICATIONS: pub_depot_master
+      REPL_SUBSCRIPTIONS: ""
+
+  border-api:
+    <<: *api-common
+    depends_on:
+      border-init:
+        condition: service_completed_successfully
+      replication-init:
+        condition: service_completed_successfully
+      border-redis:
+        condition: service_started
+    ports: ["8002:8000"]
+    environment:
+      <<: *env-common
+      SITE_CODE: BORDER-MB
+      SITE_NAME: Maseru Bridge Border Post
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@border-db:5432/borderflow
+      REDIS_URL: redis://border-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_border_events
+      REPL_SUBSCRIPTIONS: sub_border_from_depot
+
+  port-api:
+    <<: *api-common
+    depends_on:
+      port-init:
+        condition: service_completed_successfully
+      replication-init:
+        condition: service_completed_successfully
+      port-redis:
+        condition: service_started
+    ports: ["8003:8000"]
+    environment:
+      <<: *env-common
+      SITE_CODE: PORT-DBN
+      SITE_NAME: Durban Port Agent
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@port-db:5432/borderflow
+      REDIS_URL: redis://port-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_port_events
+      REPL_SUBSCRIPTIONS: sub_port_from_depot,sub_port_from_border
+
+  hub-api:
+    <<: *api-common
+    depends_on:
+      hub-init:
+        condition: service_completed_successfully
+      replication-init:
+        condition: service_completed_successfully
+      hub-redis:
+        condition: service_started
+    ports: ["8004:8000"]
+    environment:
+      <<: *env-common
+      SITE_CODE: HUB-JHB
+      SITE_NAME: Johannesburg Destination Hub
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@hub-db:5432/borderflow
+      REDIS_URL: redis://hub-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_hub_events
+      REPL_SUBSCRIPTIONS: sub_hub_from_depot,sub_hub_from_border,sub_hub_from_port
+
+  tower-api:
+    <<: *api-common
+    depends_on:
+      tower-init:
+        condition: service_completed_successfully
+      replication-init:
+        condition: service_completed_successfully
+      tower-redis:
+        condition: service_started
+    ports: ["8005:8000"]
+    environment:
+      <<: *env-common
+      SITE_CODE: CTRL-TOWER
+      SITE_NAME: Control Tower
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@tower-db:5432/borderflow
+      REDIS_URL: redis://tower-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: ""
+      REPL_SUBSCRIPTIONS: sub_tower_from_depot,sub_tower_from_border,sub_tower_from_port,sub_tower_from_hub
+
+  depot-worker:
+    <<: *worker-common
+    depends_on:
+      depot-api:
+        condition: service_started
+    environment:
+      <<: *env-common
+      SITE_CODE: DEPOT-MSU
+      SITE_NAME: Maseru Depot
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@depot-db:5432/borderflow
+      REDIS_URL: redis://depot-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_depot_master
+      REPL_SUBSCRIPTIONS: ""
+
+  border-worker:
+    <<: *worker-common
+    depends_on:
+      border-api:
+        condition: service_started
+    environment:
+      <<: *env-common
+      SITE_CODE: BORDER-MB
+      SITE_NAME: Maseru Bridge Border Post
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@border-db:5432/borderflow
+      REDIS_URL: redis://border-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_border_events
+      REPL_SUBSCRIPTIONS: sub_border_from_depot
+
+  port-worker:
+    <<: *worker-common
+    depends_on:
+      port-api:
+        condition: service_started
+    environment:
+      <<: *env-common
+      SITE_CODE: PORT-DBN
+      SITE_NAME: Durban Port Agent
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@port-db:5432/borderflow
+      REDIS_URL: redis://port-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_port_events
+      REPL_SUBSCRIPTIONS: sub_port_from_depot,sub_port_from_border
+
+  hub-worker:
+    <<: *worker-common
+    depends_on:
+      hub-api:
+        condition: service_started
+    environment:
+      <<: *env-common
+      SITE_CODE: HUB-JHB
+      SITE_NAME: Johannesburg Destination Hub
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@hub-db:5432/borderflow
+      REDIS_URL: redis://hub-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: pub_hub_events
+      REPL_SUBSCRIPTIONS: sub_hub_from_depot,sub_hub_from_border,sub_hub_from_port
+
+  tower-worker:
+    <<: *worker-common
+    depends_on:
+      tower-api:
+        condition: service_started
+    environment:
+      <<: *env-common
+      SITE_CODE: CTRL-TOWER
+      SITE_NAME: Control Tower
+      DATABASE_URL: postgresql+psycopg://borderflow:borderflow@tower-db:5432/borderflow
+      REDIS_URL: redis://tower-redis:6379/0
+      SEED_SCOPE: none
+      REPL_PUBLICATIONS: ""
+      REPL_SUBSCRIPTIONS: sub_tower_from_depot,sub_tower_from_border,sub_tower_from_port,sub_tower_from_hub
+
+volumes:
+  depot_db_data:
+  border_db_data:
+  port_db_data:
+  hub_db_data:
+  tower_db_data:
+  depot_redis_data:
+  border_redis_data:
+  port_redis_data:
+  hub_redis_data:
+  tower_redis_data:
+
+networks:
+  borderflow_net:
+    name: borderflow_net

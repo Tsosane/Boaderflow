@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Manager Review</p>
+      <h3>Replication issues and conflicts</h3>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Subscription</th>
+          <th>Type</th>
+          <th>Detail</th>
+          <th>Last seen</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issues %}
+        <tr>
+          <td>{{ issue.subscription_name }}</td>
+          <td>{{ issue.issue_type|humanize }}</td>
+          <td>{{ issue.detail }}</td>
+          <td>{{ issue.last_seen_at|dt }}</td>
+          <td>{{ "Resolved" if issue.is_resolved else "Open" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No replication issues recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

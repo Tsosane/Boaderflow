@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Master Data</p>
+      <h3>Clients</h3>
+    </div>
+    <a class="button" href="/clients/new">Register client</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Contact</th>
+          <th>Email</th>
+          <th>Country</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for client in clients %}
+        <tr>
+          <td>{{ client.company_name }}</td>
+          <td>{{ client.contact_name }}</td>
+          <td>{{ client.contact_email }}</td>
+          <td>{{ client.country }}</td>
+          <td>{{ "Active" if client.is_active else "Inactive" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No clients registered yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Master Data</p>
+      <h3>Drivers</h3>
+    </div>
+    <a class="button" href="/drivers/new">Register driver</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Licence</th>
+          <th>Expiry</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for driver in drivers %}
+        <tr>
+          <td>{{ driver.user.full_name }}</td>
+          <td>{{ driver.user.email }}</td>
+          <td>{{ driver.licence_no }}</td>
+          <td>{{ driver.licence_expiry }}</td>
+          <td>{{ "Active" if driver.is_active else "Inactive" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No drivers registered yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

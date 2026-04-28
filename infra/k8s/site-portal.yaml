@@ -1,0 +1,196 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: borderflow-portal-content
+  namespace: borderflow-site
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>BorderFlow Sites</title>
+      <style>
+        :root {
+          color-scheme: light;
+          --bg: #f5f1e8;
+          --panel: #fffaf2;
+          --ink: #1f2933;
+          --muted: #52606d;
+          --line: #d9cbb5;
+          --accent: #0f766e;
+          --accent-2: #164e63;
+        }
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          min-height: 100vh;
+          font-family: "Segoe UI", system-ui, sans-serif;
+          background:
+            radial-gradient(circle at top left, rgba(15,118,110,.18), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(22,78,99,.16), transparent 28%),
+            var(--bg);
+          color: var(--ink);
+        }
+        main {
+          width: min(1040px, calc(100vw - 32px));
+          margin: 0 auto;
+          padding: 48px 0 64px;
+        }
+        .hero {
+          background: linear-gradient(135deg, rgba(255,250,242,.96), rgba(247,239,226,.96));
+          border: 1px solid var(--line);
+          border-radius: 28px;
+          padding: 28px;
+          box-shadow: 0 24px 60px rgba(31,41,51,.08);
+        }
+        .eyebrow {
+          margin: 0 0 10px;
+          color: var(--accent);
+          text-transform: uppercase;
+          letter-spacing: .12em;
+          font-size: 12px;
+          font-weight: 700;
+        }
+        h1 {
+          margin: 0;
+          font-size: clamp(2rem, 4vw, 3.25rem);
+          line-height: 1.02;
+        }
+        .lead {
+          margin: 14px 0 0;
+          color: var(--muted);
+          font-size: 1.05rem;
+          max-width: 56rem;
+        }
+        .grid {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          margin-top: 24px;
+        }
+        .card {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding: 18px;
+          background: var(--panel);
+          border: 1px solid var(--line);
+          border-radius: 22px;
+          text-decoration: none;
+          color: inherit;
+          transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 16px 34px rgba(22,78,99,.12);
+          border-color: rgba(15,118,110,.45);
+        }
+        .code {
+          color: var(--accent-2);
+          font-weight: 700;
+          letter-spacing: .04em;
+          font-size: .78rem;
+          text-transform: uppercase;
+        }
+        .name {
+          font-size: 1.18rem;
+          font-weight: 700;
+        }
+        .url {
+          color: var(--muted);
+          word-break: break-word;
+          font-size: .92rem;
+        }
+        .hint {
+          margin-top: 20px;
+          color: var(--muted);
+          font-size: .92rem;
+        }
+      </style>
+    </head>
+    <body>
+      <main>
+        <section class="hero">
+          <p class="eyebrow">BorderFlow Cluster Entry</p>
+          <h1>Five-site BorderFlow access</h1>
+          <p class="lead">
+            This Minikube portal gives your team one place to open the live operational sites
+            while the full Kubernetes rollout continues to mature.
+          </p>
+          <div class="grid">
+            <a class="card" href="http://127.0.0.1:8001/auth/login">
+              <span class="code">DEPOT-MSU</span>
+              <span class="name">Maseru Depot</span>
+              <span class="url">http://127.0.0.1:8001/auth/login</span>
+            </a>
+            <a class="card" href="http://127.0.0.1:8002/auth/login">
+              <span class="code">BORDER-MB</span>
+              <span class="name">Maseru Bridge Border</span>
+              <span class="url">http://127.0.0.1:8002/auth/login</span>
+            </a>
+            <a class="card" href="http://127.0.0.1:8003/auth/login">
+              <span class="code">PORT-DBN</span>
+              <span class="name">Durban Port</span>
+              <span class="url">http://127.0.0.1:8003/auth/login</span>
+            </a>
+            <a class="card" href="http://127.0.0.1:8004/auth/login">
+              <span class="code">HUB-JHB</span>
+              <span class="name">Johannesburg Hub</span>
+              <span class="url">http://127.0.0.1:8004/auth/login</span>
+            </a>
+            <a class="card" href="http://127.0.0.1:8005/auth/login">
+              <span class="code">CTRL-TOWER</span>
+              <span class="name">Control Tower</span>
+              <span class="url">http://127.0.0.1:8005/auth/login</span>
+            </a>
+          </div>
+          <p class="hint">
+            Demo password for seeded accounts: <strong>borderflow123</strong>
+          </p>
+        </section>
+      </main>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: borderflow-portal
+  namespace: borderflow-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: borderflow-portal
+  template:
+    metadata:
+      labels:
+        app: borderflow-portal
+    spec:
+      containers:
+        - name: portal
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: portal-content
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+      volumes:
+        - name: portal-content
+          configMap:
+            name: borderflow-portal-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: borderflow-portal
+  namespace: borderflow-site
+spec:
+  selector:
+    app: borderflow-portal
+  ports:
+    - port: 8080
+      targetPort: 80

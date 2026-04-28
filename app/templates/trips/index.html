@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Workflow</p>
+      <h3>Trips</h3>
+    </div>
+    <a class="button" href="/trips/new">Plan trip</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Vehicle</th>
+          <th>Driver</th>
+          <th>Status</th>
+          <th>Container</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trip in trips %}
+        <tr>
+          <td>{{ trip.origin_site.name }} to {{ trip.destination_site.name }}</td>
+          <td>{{ trip.vehicle.registration_no }}</td>
+          <td>{{ trip.driver.user.full_name }}</td>
+          <td>{{ trip.status|humanize }}</td>
+          <td>
+            {% for assignment in assignment_map.get(trip.id, []) %}
+            {{ assignment.container.container_no }}
+            {% else %}
+            N/A
+            {% endfor %}
+          </td>
+          <td>
+            {% if trip.status == "PLANNED" %}
+            <form action="/trips/{{ trip.id }}/depart" method="post" class="inline-form">
+              <input type="datetime-local" name="departure_time" required>
+              <button type="submit" class="button button-secondary">Depart</button>
+            </form>
+            {% else %}
+            <span class="muted">No action</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No trips yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

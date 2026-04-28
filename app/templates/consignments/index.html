@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Workflow</p>
+      <h3>Consignments</h3>
+    </div>
+    <a class="button" href="/consignments/new">New consignment</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Client</th>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for consignment in consignments %}
+        <tr>
+          <td>{{ consignment.reference_no }}</td>
+          <td>{{ consignment.client.company_name }}</td>
+          <td>{{ consignment.origin_site.name }}</td>
+          <td>{{ consignment.destination_site.name }}</td>
+          <td>{{ consignment.created_at|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No consignments yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

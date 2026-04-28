@@ -1,0 +1,80 @@
+from __future__ import annotations
+
+from enum import StrEnum
+
+
+class SiteCode(StrEnum):
+    DEPOT_MSU = "DEPOT-MSU"
+    BORDER_MB = "BORDER-MB"
+    PORT_DBN = "PORT-DBN"
+    HUB_JHB = "HUB-JHB"
+    CTRL_TOWER = "CTRL-TOWER"
+
+
+class SiteType(StrEnum):
+    DEPOT = "DEPOT"
+    BORDER_POST = "BORDER_POST"
+    PORT_AGENT = "PORT_AGENT"
+    DESTINATION_HUB = "DESTINATION_HUB"
+    CONTROL_TOWER = "CONTROL_TOWER"
+
+
+class UserRole(StrEnum):
+    DEPOT_CONTROLLER = "DEPOT_CONTROLLER"
+    DRIVER = "DRIVER"
+    YARD_CLERK = "YARD_CLERK"
+    BORDER_AGENT = "BORDER_AGENT"
+    PORT_AGENT = "PORT_AGENT"
+    HUB_OPERATOR = "HUB_OPERATOR"
+    MANAGER = "MANAGER"
+
+
+class TripStatus(StrEnum):
+    PLANNED = "PLANNED"
+    DEPARTED = "DEPARTED"
+    IN_TRANSIT = "IN_TRANSIT"
+    ARRIVED = "ARRIVED"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+
+class MilestoneType(StrEnum):
+    DEPARTED = "DEPARTED"
+    ARRIVED = "ARRIVED"
+    QUEUED = "QUEUED"
+    CLEARED = "CLEARED"
+    GATE_IN = "GATE_IN"
+    PORT_CLEARED = "PORT_CLEARED"
+    RELEASED = "RELEASED"
+    DELIVERED = "DELIVERED"
+
+
+class IncidentType(StrEnum):
+    BREAKDOWN = "BREAKDOWN"
+    DOCUMENT_PROBLEM = "DOCUMENT_PROBLEM"
+    DAMAGE = "DAMAGE"
+    SECURITY = "SECURITY"
+    DELAY = "DELAY"
+    OTHER = "OTHER"
+
+
+class IncidentSeverity(StrEnum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+
+class ReplicationIssueType(StrEnum):
+    APPLY_ERROR = "APPLY_ERROR"
+    SYNC_ERROR = "SYNC_ERROR"
+    CONFLICT = "CONFLICT"
+    STALE_SUBSCRIPTION = "STALE_SUBSCRIPTION"
+    SUBSCRIPTION_MISSING = "SUBSCRIPTION_MISSING"
+    PERMISSION_ERROR = "PERMISSION_ERROR"
+
+
+class EventOperation(StrEnum):
+    INSERT = "INSERT"
+    UPDATE = "UPDATE"
+

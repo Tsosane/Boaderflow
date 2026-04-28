@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+.env
+.venv/
+venv/
+
+borderflow.db
+runtime/db/
+runtime/logs/
+preview.err.log
+preview.out.log
+
+build/
+dist/

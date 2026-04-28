@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Workflow</p>
+      <h3>Containers</h3>
+    </div>
+    <a class="button" href="/containers/new">Register container</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Consignment</th>
+          <th>Type</th>
+          <th>Seal</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for container in containers %}
+        <tr>
+          <td>{{ container.container_no }}</td>
+          <td>{{ container.consignment.reference_no }}</td>
+          <td>{{ container.container_type }}</td>
+          <td>{{ container.seal_no or "N/A" }}</td>
+          <td>{{ container.created_at|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No containers yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

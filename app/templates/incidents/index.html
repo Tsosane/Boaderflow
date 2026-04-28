@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Exception Handling</p>
+      <h3>Incidents</h3>
+    </div>
+    <a class="button" href="/incidents/new">Log incident</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Severity</th>
+          <th>Trip</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for incident in incidents %}
+        <tr>
+          <td>{{ incident.incident_type|humanize }}</td>
+          <td>{{ incident.severity|humanize }}</td>
+          <td>{{ incident.trip_id }}</td>
+          <td>{{ "Resolved" if incident.resolved else "Open" }}</td>
+          <td>
+            {% if not incident.resolved %}
+            <form action="/incidents/{{ incident.id }}/resolve" method="post">
+              <button type="submit" class="button button-secondary">Resolve</button>
+            </form>
+            {% else %}
+            <span class="muted">Closed</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No incidents logged yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

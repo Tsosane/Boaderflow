@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Global Read Model</p>
+      <h3>Container states</h3>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Consignment</th>
+          <th>Status</th>
+          <th>Current site</th>
+          <th>Trip status</th>
+          <th>Last event</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in container_states %}
+        <tr>
+          <td>{{ row.container_no }}</td>
+          <td>{{ row.consignment_ref }}</td>
+          <td>{{ row.current_status|humanize }}</td>
+          <td>{{ row.current_site_name or "In Transit" }}</td>
+          <td>{{ row.trip_status|humanize }}</td>
+          <td>{{ row.latest_milestone_time|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No replicated container state yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Audit Stream</p>
+      <h3>Recent events</h3>
+    </div>
+  </div>
+  <ul class="event-list">
+    {% for event in recent_events %}
+    <li>
+      <strong>{{ event.entity_name|humanize }}</strong>
+      <span>{{ event.origin_site_code }}</span>
+      <small>{{ event.event_time|dt }}</small>
+    </li>
+    {% else %}
+    <li class="empty">No replicated audit events yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
+

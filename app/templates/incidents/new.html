@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/incidents" method="post" class="stack">
+    <label>
+      <span>Trip</span>
+      <select name="trip_id" required>
+        {% for trip in trips %}
+        <option value="{{ trip.id }}">{{ trip.id }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Container</span>
+      <select name="container_id">
+        <option value="">General trip incident</option>
+        {% for container in containers %}
+        <option value="{{ container.id }}">{{ container.container_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Incident type</span>
+      <select name="incident_type" required>
+        {% for item in incident_types %}
+        <option value="{{ item.value }}">{{ item.value|humanize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Severity</span>
+      <select name="severity" required>
+        {% for item in incident_severities %}
+        <option value="{{ item.value }}">{{ item.value|humanize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Incident time</span>
+      <input type="datetime-local" name="incident_time" required>
+    </label>
+    <label>
+      <span>Description</span>
+      <textarea name="description" rows="5" required></textarea>
+    </label>
+    <div class="action-row">
+      <a href="/incidents" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Log incident</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric-card">
+    <p>Consignments</p>
+    <strong>{{ metrics.consignments }}</strong>
+  </article>
+  <article class="metric-card">
+    <p>Containers</p>
+    <strong>{{ metrics.containers }}</strong>
+  </article>
+  <article class="metric-card">
+    <p>Trips</p>
+    <strong>{{ metrics.trips }}</strong>
+  </article>
+  <article class="metric-card">
+    <p>Open Issues</p>
+    <strong>{{ metrics.issues }}</strong>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Current Work</p>
+      <h3>Quick actions</h3>
+    </div>
+  </div>
+  <div class="quick-grid">
+    {% if current_user.role == "DEPOT_CONTROLLER" %}
+    <a class="quick-card" href="/users/new">Register site user</a>
+    <a class="quick-card" href="/clients/new">Register client</a>
+    <a class="quick-card" href="/vehicles/new">Register vehicle</a>
+    <a class="quick-card" href="/drivers/new">Register driver</a>
+    <a class="quick-card" href="/consignments/new">Create consignment</a>
+    <a class="quick-card" href="/containers/new">Register container</a>
+    <a class="quick-card" href="/trips/new">Plan trip</a>
+    {% elif current_user.role in ["BORDER_AGENT", "PORT_AGENT", "HUB_OPERATOR"] %}
+    <a class="quick-card" href="/users/new">Register site user</a>
+    <a class="quick-card" href="/milestones/new">Record milestone</a>
+    <a class="quick-card" href="/handovers/new">Record handover</a>
+    <a class="quick-card" href="/incidents/new">Log incident</a>
+    {% elif current_user.role == "MANAGER" %}
+    <a class="quick-card" href="/users/new">Register site user</a>
+    <a class="quick-card" href="/control-tower/containers">View live states</a>
+    <a class="quick-card" href="/control-tower/conflicts">Review conflicts</a>
+    <a class="quick-card" href="/control-tower/replication">Check replication</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="two-column">
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Journey View</p>
+        <h3>Container states</h3>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Container</th>
+            <th>Consignment</th>
+            <th>Status</th>
+            <th>Site</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in container_states %}
+          <tr>
+            <td>{{ row.container_no }}</td>
+            <td>{{ row.consignment_ref }}</td>
+            <td>{{ row.current_status|humanize }}</td>
+            <td>{{ row.current_site_name or "In Transit" }}</td>
+            <td>{{ row.latest_milestone_time|dt }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty">No container state available yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Audit Trail</p>
+        <h3>Recent events</h3>
+      </div>
+    </div>
+    <ul class="event-list">
+      {% for event in recent_events %}
+      <li>
+        <strong>{{ event.entity_name|humanize }}</strong>
+        <span>{{ event.operation }}</span>
+        <small>{{ event.event_time|dt }}</small>
+      </li>
+      {% else %}
+      <li class="empty">No events yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BorderFlow Login</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="auth-body">
+  <section class="auth-shell">
+    <div class="auth-panel">
+      <p class="eyebrow">Cross-Border Operations</p>
+      <h1>BorderFlow</h1>
+      <p class="lead">Log into the site-local workspace for {{ site_name }}.</p>
+
+      {% if message %}
+      <div class="alert success">{{ message }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="alert error">{{ error }}</div>
+      {% endif %}
+
+      <form action="/auth/login" method="post" class="stack">
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="depot.controller@borderflow.local" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="borderflow123" required>
+        </label>
+        <button type="submit" class="button">Sign In</button>
+      </form>
+
+      <div class="auth-links">
+        <span class="muted">Need an account for {{ site_name }}?</span>
+        <a class="button button-secondary" href="/auth/register">Sign Up</a>
+      </div>
+    </div>
+
+    <div class="auth-side">
+      <h3>Available roles</h3>
+      <ul class="plain-list">
+        {% for role in allowed_roles %}
+        <li>{{ role|humanize }}</li>
+        {% endfor %}
+      </ul>
+
+      <h3>Demo users</h3>
+      <ul class="plain-list">
+        <li>`depot.controller@borderflow.local`</li>
+        <li>`border.agent@borderflow.local`</li>
+        <li>`port.agent@borderflow.local`</li>
+        <li>`hub.operator@borderflow.local`</li>
+        <li>`manager@borderflow.local`</li>
+      </ul>
+      <p class="muted">Password: <strong>borderflow123</strong></p>
+    </div>
+  </section>
+</body>
+</html>

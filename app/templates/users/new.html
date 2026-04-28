@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel form-panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Access Management</p>
+      <h3>Register site user</h3>
+    </div>
+  </div>
+
+  <form method="post" action="/users" class="form-grid">
+    <label>
+      <span>Full name</span>
+      <input type="text" name="full_name" required>
+    </label>
+
+    <label>
+      <span>Email address</span>
+      <input type="email" name="email" required>
+    </label>
+
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" value="{{ settings.seed_password }}" required>
+    </label>
+
+    <label>
+      <span>Role</span>
+      <select name="role" required>
+        {% for role in allowed_roles %}
+        <option value="{{ role }}">{{ role|humanize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div class="form-note">
+      Driver accounts are created from the Drivers page because they also require licence details.
+    </div>
+
+    <div class="form-actions">
+      <a class="button button-secondary" href="/users">Cancel</a>
+      <button class="button" type="submit">Register user</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

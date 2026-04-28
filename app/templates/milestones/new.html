@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/milestones" method="post" class="stack">
+    <label>
+      <span>Trip and container</span>
+      <select name="trip_id" id="trip-select" required>
+        {% for assignment in assignments %}
+        <option value="{{ assignment.trip_id }}" data-container="{{ assignment.container_id }}">
+          {{ assignment.container.container_no }} on trip {{ assignment.trip_id }}
+        </option>
+        {% endfor %}
+      </select>
+      {% if assignments %}
+      <input type="hidden" name="container_id" value="{{ assignments[0].container_id }}">
+      {% endif %}
+    </label>
+    <label>
+      <span>Milestone</span>
+      <select name="milestone_type" required>
+        {% for milestone in allowed_milestones %}
+        <option value="{{ milestone.value }}">{{ milestone.value|humanize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Milestone time</span>
+      <input type="datetime-local" name="milestone_time" required>
+    </label>
+    <label>
+      <span>Notes</span>
+      <textarea name="notes" rows="4" placeholder="Optional operational note"></textarea>
+    </label>
+    <div class="action-row">
+      <a href="/milestones" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Record</button>
+    </div>
+  </form>
+</section>
+<script>
+  const tripSelect = document.getElementById('trip-select');
+  const containerField = document.querySelector('input[name="container_id"]');
+  if (tripSelect && containerField) {
+    tripSelect.addEventListener('change', () => {
+      containerField.value = tripSelect.options[tripSelect.selectedIndex].dataset.container;
+    });
+  }
+</script>
+{% endblock %}
+

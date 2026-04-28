@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Site Workflow</p>
+      <h3>Handovers</h3>
+    </div>
+    <a class="button" href="/handovers/new">Record handover</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Route</th>
+          <th>Seal</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for handover in handovers %}
+        <tr>
+          <td>{{ handover.container.container_no }}</td>
+          <td>{{ handover.from_site.name }} to {{ handover.to_site.name }}</td>
+          <td>{{ "Verified" if handover.seal_verified else "Not verified" }}</td>
+          <td>{{ handover.handover_time|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">No handovers yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

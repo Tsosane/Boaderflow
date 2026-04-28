@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Logical Replication</p>
+      <h3>Subscription health snapshot</h3>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Subscription</th>
+          <th>Worker</th>
+          <th>PID</th>
+          <th>Received LSN</th>
+          <th>Last receipt</th>
+          <th>Apply errors</th>
+          <th>Sync errors</th>
+          <th>Conflicts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in snapshot %}
+        <tr>
+          <td>{{ row.subname }}</td>
+          <td>{{ row.worker_type|humanize }}</td>
+          <td>{{ row.pid or "N/A" }}</td>
+          <td>{{ row.received_lsn or "N/A" }}</td>
+          <td>{{ row.last_msg_receipt_time|dt }}</td>
+          <td>{{ row.apply_error_count or 0 }}</td>
+          <td>{{ row.sync_error_count or 0 }}</td>
+          <td>{{ row.conflict_total or 0 }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">No subscription data available yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

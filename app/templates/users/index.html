@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Access Management</p>
+      <h3>Site users</h3>
+    </div>
+    <a class="button" href="/users/new">Register user</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role|humanize }}</td>
+          <td>{{ "Active" if user.is_active else "Inactive" }}</td>
+          <td>{{ user.created_at|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No users registered for this site yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

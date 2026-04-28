@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Site Workflow</p>
+      <h3>Milestones</h3>
+    </div>
+    <a class="button" href="/milestones/new">Record milestone</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Trip</th>
+          <th>Milestone</th>
+          <th>Site</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for milestone in milestones %}
+        <tr>
+          <td>{{ milestone.container.container_no }}</td>
+          <td>{{ milestone.trip.id }}</td>
+          <td>{{ milestone.milestone_type|humanize }}</td>
+          <td>{{ milestone.site.name }}</td>
+          <td>{{ milestone.milestone_time|dt }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">No milestones recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

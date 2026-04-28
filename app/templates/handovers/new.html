@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/handovers" method="post" class="stack">
+    <label>
+      <span>Trip</span>
+      <select name="trip_id" required>
+        {% for trip in trips %}
+        <option value="{{ trip.id }}">{{ trip.id }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Container</span>
+      <select name="container_id" required>
+        {% for container in containers %}
+        <option value="{{ container.id }}">{{ container.container_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>From site</span>
+      <select name="from_site_id" required>
+        {% for site in sites %}
+        <option value="{{ site.id }}">{{ site.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>To site</span>
+      <select name="to_site_id" required>
+        {% for site in sites %}
+        <option value="{{ site.id }}">{{ site.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Sender</span>
+      <select name="sender_user_id" required>
+        {% for user in users %}
+        <option value="{{ user.id }}">{{ user.full_name }} ({{ user.site.name }})</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Receiver</span>
+      <select name="receiver_user_id" required>
+        {% for user in users %}
+        <option value="{{ user.id }}">{{ user.full_name }} ({{ user.site.name }})</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" name="seal_verified" value="true">
+      <span>Seal verified</span>
+    </label>
+    <label>
+      <span>Seal number</span>
+      <input type="text" name="seal_no" placeholder="Optional seal number">
+    </label>
+    <label>
+      <span>Handover time</span>
+      <input type="datetime-local" name="handover_time" required>
+    </label>
+    <label>
+      <span>Notes</span>
+      <textarea name="notes" rows="4"></textarea>
+    </label>
+    <div class="action-row">
+      <a href="/handovers" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Record handover</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

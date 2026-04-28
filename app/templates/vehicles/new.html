@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/vehicles" method="post" class="stack">
+    <label>
+      <span>Registration number</span>
+      <input type="text" name="registration_no" required>
+    </label>
+    <label>
+      <span>Vehicle type</span>
+      <input type="text" name="vehicle_type" placeholder="FLATBED" required>
+    </label>
+    <label>
+      <span>Capacity (TEU)</span>
+      <input type="number" name="capacity_teu" min="1" required>
+    </label>
+    <div class="action-row">
+      <a href="/vehicles" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Register vehicle</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

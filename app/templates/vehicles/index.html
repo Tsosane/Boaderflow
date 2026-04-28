@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Depot Master Data</p>
+      <h3>Vehicles</h3>
+    </div>
+    <a class="button" href="/vehicles/new">Register vehicle</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Registration</th>
+          <th>Type</th>
+          <th>Capacity (TEU)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vehicle in vehicles %}
+        <tr>
+          <td>{{ vehicle.registration_no }}</td>
+          <td>{{ vehicle.vehicle_type }}</td>
+          <td>{{ vehicle.capacity_teu }}</td>
+          <td>{{ "Active" if vehicle.is_active else "Inactive" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">No vehicles registered yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="form-panel">
+  <form action="/trips" method="post" class="stack">
+    <label>
+      <span>Destination site</span>
+      <select name="destination_site_id" required>
+        {% for site in destinations %}
+        <option value="{{ site.id }}">{{ site.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Vehicle</span>
+      <select name="vehicle_id" required>
+        {% for vehicle in vehicles %}
+        <option value="{{ vehicle.id }}">{{ vehicle.registration_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Driver</span>
+      <select name="driver_id" required>
+        {% for driver in drivers %}
+        <option value="{{ driver.id }}">{{ driver.user.full_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Container</span>
+      <select name="container_id" required>
+        {% for container in containers %}
+        <option value="{{ container.id }}">{{ container.container_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Planned departure</span>
+      <input type="datetime-local" name="planned_departure" required>
+    </label>
+    <div class="action-row">
+      <a href="/trips" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button">Create trip</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
